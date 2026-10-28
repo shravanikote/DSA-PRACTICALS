@@ -1,0 +1,542 @@
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Node class for Music Playlist
+class Node {
+public:
+    string song;
+    string artist;
+    Node* prev;
+    Node* next;
+
+    Node(string s, string a) {
+        song = s;
+        artist = a;
+        prev = nullptr;
+        next = nullptr;
+    }
+};
+
+class MusicPlaylist {
+private:
+    Node* head;
+    Node* current;
+
+public:
+    MusicPlaylist() {
+        head = nullptr;
+        current = nullptr;
+    }
+
+    // Add a song at the end
+    void addSong(string song, string artist) {
+        Node* p = new Node(song, artist); // p points to new node
+
+        if (head == nullptr) {
+            head = p;
+            current = p;
+        } else {
+            Node* q = head; // q traverses the list
+
+            while (q->next != nullptr) {
+                q = q->next;
+            }
+
+            q->next = p;
+            p->prev = q;
+        }
+
+        cout << "Song added successfully!\n";
+    }
+
+    // Delete a song by title
+    void deleteSong(string title) {
+        Node* q = head;
+        Node* p = nullptr;
+
+        while (q != nullptr && q->song != title) {
+            q = q->next;
+        }
+
+        if (q == nullptr) {
+            cout << "Song not found!\n";
+            return;
+        }
+
+        p = q; // p points to the node to be deleted
+
+        if (p == current) {
+            current = (p->next != nullptr) ? p->next : p->prev;
+        }
+
+        if (p->prev != nullptr) {
+            p->prev->next = p->next;
+        } else {
+            head = p->next;
+        }
+
+        if (p->next != nullptr) {
+            p->next->prev = p->prev;
+        }
+
+        delete p;
+
+        if (head == nullptr) {
+            current = nullptr;
+        }
+
+        cout << "Song deleted successfully!\n";
+    }
+
+    // Display playlist forward
+    void displayPlaylist() {
+        Node* q = head;
+
+        if (q == nullptr) {
+            cout << "Playlist is empty!\n";
+            return;
+        }
+
+        cout << "\nForward Playlist:\n";
+
+        while (q != nullptr) {
+            cout << q->song << " - " << q->artist << endl;
+            q = q->next;
+        }
+    }
+
+    // Display playlist in reverse
+    void displayReverse() {
+        Node* q = head;
+
+        if (q == nullptr) {
+            cout << "Playlist is empty!\n";
+            return;
+        }
+
+        while (q->next != nullptr) {
+            q = q->next;
+        }
+
+        cout << "\nReverse Playlist:\n";
+
+        while (q != nullptr) {
+            cout << q->song << " - " << q->artist << endl;
+            q = q->prev;
+        }
+    }
+
+    // Play current song
+    void playCurrent() {
+        if (current == nullptr) {
+            cout << "Playlist is empty!\n";
+        } else {
+            cout << "Now Playing: " << current->song
+                 << " - " << current->artist << endl;
+        }
+    }
+
+    // Play next song
+    void playNext() {
+        if (current == nullptr) {
+            cout << "Playlist is empty!\n";
+        } else if (current->next == nullptr) {
+            cout << "You are at the last song!\n";
+        } else {
+            current = current->next;
+            playCurrent();
+        }
+    }
+
+    // Play previous song
+    void playPrevious() {
+        if (current == nullptr) {
+            cout << "Playlist is empty!\n";
+        } else if (current->prev == nullptr) {
+            cout << "You are at the first song!\n";
+        } else {
+            current = current->prev;
+            playCurrent();
+        }
+    }
+
+    // Play the complete playlist
+    void playCompletePlaylist() {
+        Node* q = head;
+
+        if (q == nullptr) {
+            cout << "Playlist is empty!\n";
+            return;
+        }
+
+        cout << "\nPlaying Complete Playlist:\n";
+
+        while (q != nullptr) {
+            cout << "Playing: " << q->song
+                 << " - " << q->artist << endl;
+            q = q->next;
+        }
+
+        current = head;
+    }
+
+    // Repeat the complete playlist
+    void repeatAll() {
+        if (head == nullptr) {
+            cout << "Playlist is empty!\n";
+            return;
+        }
+
+        int repetitions;
+        cout << "Enter number of repetitions: ";
+        cin >> repetitions;
+
+        if (repetitions <= 0) {
+            cout << "Enter a positive number!\n";
+            return;
+        }
+
+        for (int i = 1; i <= repetitions; i++) {
+            Node* q = head;
+
+            cout << "\nRepetition " << i << ":\n";
+
+            while (q != nullptr) {
+                cout << "Playing: " << q->song
+                     << " - " << q->artist << endl;
+                q = q->next;
+            }
+        }
+
+        current = head;
+    }
+
+    // Show current song
+    void showCurrent() {
+        if (current == nullptr) {
+            cout << "No current song!\n";
+        } else {
+            cout << "Current Song: " << current->song
+                 << " - " << current->artist << endl;
+        }
+    }
+
+    // Release allocated memory
+    ~MusicPlaylist() {
+        Node* q = head;
+
+        while (q != nullptr) {
+            Node* p = q;
+            q = q->next;
+            delete p;
+        }
+    }
+};
+
+int main() {
+    MusicPlaylist playlist;
+
+    // Initial three songs
+    playlist.addSong("Levitating", "Dua Lipa");
+    playlist.addSong("Dilemma", "Nelly ft. Kelly Rowland");
+    playlist.addSong("Espresso", "Sabrina Carpenter");
+
+    int choice;
+    string song, artist;
+
+    do {
+        cout << "\n===== MUSIC PLAYLIST MANAGER =====\n";
+        cout << "1. Add Song\n";
+        cout << "2. Delete Song\n";
+        cout << "3. Display Playlist\n";
+        cout << "4. Display Playlist in Reverse\n";
+        cout << "5. Play Current Song\n";
+        cout << "6. Play Next Song\n";
+        cout << "7. Play Previous Song\n";
+        cout << "8. Play Complete Playlist\n";
+        cout << "9. Repeat All\n";
+        cout << "10. Show Current Song\n";
+        cout << "11. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+        cin.ignore(10000, '\n');
+
+        switch (choice) {
+        case 1:
+            cout << "Enter song title: ";
+            getline(cin, song);
+            cout << "Enter artist name: ";
+            getline(cin, artist);
+            playlist.addSong(song, artist);
+            break;
+
+        case 2:
+            cout << "Enter song title to delete: ";
+            getline(cin, song);
+            playlist.deleteSong(song);
+            break;
+
+        case 3:
+            playlist.displayPlaylist();
+            break;
+
+        case 4:
+            playlist.displayReverse();
+            break;
+
+        case 5:
+            playlist.playCurrent();
+            break;
+
+        case 6:
+            playlist.playNext();
+            break;
+
+        case 7:
+            playlist.playPrevious();
+            break;
+
+        case 8:
+            playlist.playCompletePlaylist();
+            break;
+
+        case 9:
+            playlist.repeatAll();
+            break;
+
+        case 10:
+            playlist.showCurrent();
+            break;
+
+        case 11:
+            cout << "Exiting Music Playlist Manager.\n";
+            break;
+
+        default:
+            cout << "Invalid choice! Try again.\n";
+        }
+
+    } while (choice != 11);
+
+    return 0;
+}
+
+OUTPUT:
+Song added successfully!
+Song added successfully!
+Song added successfully!
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 1
+Enter song title: Shape of You
+Enter artist name: Ed Sheeran
+Song added successfully!
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 1
+Enter song title: Dandelions
+Enter artist name: Ruth.B
+Song added successfully!
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 2
+Enter song title to delete: Dandelions
+Song deleted successfully!
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 3
+
+Forward Playlist:
+Levitating - Dua Lipa
+Dilemma - Nelly ft. Kelly Rowland
+Espresso - Sabrina Carpenter
+Shape of You - Ed Sheeran
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 4
+
+Reverse Playlist:
+Shape of You - Ed Sheeran
+Espresso - Sabrina Carpenter
+Dilemma - Nelly ft. Kelly Rowland
+Levitating - Dua Lipa
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 5
+Now Playing: Levitating - Dua Lipa
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 6
+Now Playing: Dilemma - Nelly ft. Kelly Rowland
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 7
+Now Playing: Levitating - Dua Lipa
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 8
+
+Playing Complete Playlist:
+Playing: Levitating - Dua Lipa
+Playing: Dilemma - Nelly ft. Kelly Rowland
+Playing: Espresso - Sabrina Carpenter
+Playing: Shape of You - Ed Sheeran
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 9
+Enter number of repetitions: 2
+
+Repetition 1:
+Playing: Levitating - Dua Lipa
+Playing: Dilemma - Nelly ft. Kelly Rowland
+Playing: Espresso - Sabrina Carpenter
+Playing: Shape of You  - Ed Sheeran
+
+Repetition 2:
+Playing: Levitating - Dua Lipa
+Playing: Dilemma - Nelly ft. Kelly Rowland
+Playing: Espresso - Sabrina Carpenter
+Playing: Shape of You  - Ed Sheeran
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 10
+Current Song: Levitating - Dua Lipa
+
+===== MUSIC PLAYLIST MANAGER =====
+1. Add Song
+2. Delete Song
+3. Display Playlist
+4. Display Playlist in Reverse
+5. Play Current Song
+6. Play Next Song
+7. Play Previous Song
+8. Play Complete Playlist
+9. Repeat All
+10. Show Current Song
+11. Exit
+Enter your choice: 11
+Exiting Music Playlist Manager.
+
